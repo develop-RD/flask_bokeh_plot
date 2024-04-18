@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Count update</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <h1>Count: <span id="count"></span></h1>
+    <script>
+        function getCount() {
+            $.ajax({
+                url: "/get_count",
+                type: "GET",
+                success: function(response) {
+                    $('#count').text(response.count);
+                },
+                error: function(error) {
+                    console.log(error);
+                }
+            });
+        }
+
+        $(document).ready(function() {
+            setInterval(getCount, 100);
+        });
+    </script>
+</body>
+</html>
