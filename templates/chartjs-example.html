@@ -3,37 +3,76 @@
 
 <head>
 	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 	<title>Chartjs Charts</title>
 </head>
 
 <body>
 	<div style="height: 50vh; width: 50%;">
+    <h1>Count: <span id="count"></span></h1>
 		<canvas id="myChart"></canvas>
 	</div>
 
 	<script>
-		const labels = {{ labels | tojson}};
+			let myCount = 15;
 
-		const data = {
-			labels: labels,
-			datasets: [{
-				label: 'Sin x',
-				backgroundColor: 'rgb(255, 99, 132)',
-				borderColor: 'rgb(255, 99, 132)',
-				data: {{ data | tojson}},
-			}]
-		};
+			// Счётчик
+      function getCount() {
 
-		const config = {
-			type: 'line',
-			data: data,
-			options: { maintainAspectRatio: false }
-		};
+          $.ajax({
+              url: "/get_count",
+              type: "GET",
+              success: function(response) {
+                  $('#count').text(response.count_n);
+                	myCount = response.count_n;
+									console.log(response.data)
 
-		const myChart = new Chart(
-			document.getElementById('myChart'),
-			config
-		);
+					let labels = {{ labels | tojson}};
+
+					let data = {
+						labels: labels,
+						datasets: [{
+							label: 'Sin x',
+							backgroundColor: 'rgb(255, 99, 132)',
+							borderColor: 'rgb(255, 99, 132)',
+							data: {{ data | tojson}},
+						}]
+					};
+
+					let config = {
+						type: 'line',
+						data: data,
+						options: { maintainAspectRatio: false }
+					};
+
+								labels = response.labels
+								data = response.data
+//					const myChart;
+					if (typeof myChart !== 'undefined')
+					{
+						console.log('no data')
+							 const myChart = new Chart(
+								document.getElementById('myChart'),
+								config
+							);
+
+					}
+					else
+					{
+							console.log('data')
+							myChart.update()
+					}
+              },
+              error: function(error) {
+                  console.log(error);
+              }
+          });
+      }
+
+        $(document).ready(function() {
+            setInterval(getCount, 1000);
+        });
+
 
 	</script>
 </body>
