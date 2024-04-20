@@ -14,61 +14,60 @@
 	</div>
 
 	<script>
-			let myCount = 15;
-
-			// Счётчик
-      function getCount() {
-
-          $.ajax({
-              url: "/get_count",
-              type: "GET",
-              success: function(response) {
-                  $('#count').text(response.count_n);
-                	myCount = response.count_n;
-									console.log(response.data)
-
-					let labels = {{ labels | tojson}};
-
-					let data = {
-						labels: labels,
-						datasets: [{
-							label: 'Sin x',
-							backgroundColor: 'rgb(255, 99, 132)',
-							borderColor: 'rgb(255, 99, 132)',
-							data: {{ data | tojson}},
-						}]
-					};
-
+// парсим данные от приложения
+		let labels = {{ labels | tojson}};
+// заполняем основную структуру для построения графика
+		let data = {
+			labels: labels,
+			datasets: [{
+			label: 'Sin x',
+			backgroundColor: 'rgb(255, 99, 132)',
+			borderColor: 'rgb(255, 99, 132)',
+			data: {{ data | tojson}},
+			}]
+		};
+// Основное описание графика
 					let config = {
 						type: 'line',
 						data: data,
 						options: { maintainAspectRatio: false }
 					};
 
-								labels = response.labels
-								data = response.data
-//					const myChart;
-					if (typeof myChart !== 'undefined')
-					{
-						console.log('no data')
-							 const myChart = new Chart(
+// Создание самого графика
+			const myChart = new Chart(
 								document.getElementById('myChart'),
 								config
 							);
 
-					}
-					else
-					{
-							console.log('data')
-							myChart.update()
-					}
+			// Обновление данных
+      function getCount() {
+
+          $.ajax({
+              url: "/get_count",// ссылка на функцию внутри приложения python
+              type: "GET",
+              success: function(response) {
+              	// парсим данные от приложения и выводим на страницу
+                  $('#count').text(response.count_n);
+                	myCount = response.count_n;
+                // вывод в лог на консоли данные от приложения на питоне
+									console.log(response.data)
+								// присваиваем новые данные полученные из питона в data
+								let updatedData = response.data;
+								let updateLabels = response.labels;
+								// обновляем data и labels 
+								myChart.data.labels = updateLabels;
+								myChart.data.datasets[0].data = updatedData;
+								// сама функция обновления графика
+								myChart.update();
+
               },
               error: function(error) {
                   console.log(error);
               }
           });
       }
-
+			// устанавливаем с какой частотой сервер будет опрашивать 
+			// приложение в питоне
         $(document).ready(function() {
             setInterval(getCount, 1000);
         });

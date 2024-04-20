@@ -16,8 +16,7 @@ time_x = time_x.tolist()
 signal_x = signal_x.tolist()
 # Счётчик для инкремента
 count = 0
-
-sir = 65
+ 
 # функция обновления счётчика
 def update_count():
     global count, signal_x, time_x
@@ -34,7 +33,7 @@ def update_count():
 
 @app.route('/get_count', methods=['GET'])
 def get_count():
-    return jsonify({'count_n': count, 'sir':sir, 'data':signal_x,'labels':time_x})
+    return jsonify({'count_n': count, 'data':signal_x,'labels':time_x})
 
 # формирую синус 
 @app.route('/')
@@ -44,7 +43,7 @@ def homepage():
                            labels=time_x)
 def runApp():
     #app.run(host="localhost", port=8086, debug=False)
-    app.run(host="127.0.0.1", port=8086, debug=False)
+    app.run(host="127.0.0.1", port=5000, debug=False)
 
 # Main Driver Function 
 if __name__ == '__main__':
