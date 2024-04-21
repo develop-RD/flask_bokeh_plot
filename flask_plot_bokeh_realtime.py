@@ -1,9 +1,7 @@
 # Importing required functions 
 from flask import Flask, render_template, jsonify
 import numpy as np
-import random
 import time
-from threading import Thread
 # Flask constructor 
 app = Flask(__name__)
 

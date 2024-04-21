@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<title>Param_system</title>
+</head>
+
+<body>
+	<div style="height: 50vh; width: 50%;">
+		<canvas id="ParamSystem_RAM"></canvas>
+		<canvas id="ParamSystem_Temp"></canvas>
+		<canvas id="ParamSystem_CPU"></canvas>
+	</div>
+
+	<script>
+// парсим данные от приложения
+		let labels = {{ labels | tojson}};
+// заполняем основную структуру для построения графика
+		let data_cpu = {
+			labels: labels,
+			datasets: [{
+			label: 'CPU',
+			backgroundColor: 'rgb(255, 99, 132)',
+			borderColor: 'rgb(255, 99, 132)',
+			data: {{ data_cpu | tojson}},
+			}]
+		};
+// Основное описание графика
+					let config_cpu = {
+						type: 'line',
+						data: data_cpu,
+						options: { maintainAspectRatio: false }
+					};
+
+// Создание самого графика
+		const ParamSystem_CPU = new Chart(
+								document.getElementById('ParamSystem_CPU'),
+								config_cpu
+							);
+// заполняем основную структуру для построения графика
+		let data_temp = {
+			labels: labels,
+			datasets: [{
+			label: 'Temp',
+			backgroundColor: 'rgb(255, 30, 132)',
+			borderColor: 'rgb(255, 99, 132)',
+			data: {{ data_temp | tojson}},
+			}]
+		};
+// Основное описание графика
+					let config_temp = {
+						type: 'line',
+						data: data_temp,
+						options: { maintainAspectRatio: false }
+					};
+
+		const ParamSystem_Temp = new Chart(
+								document.getElementById('ParamSystem_Temp'),
+								config_temp
+							);
+
+
+// заполняем основную структуру для построения графика
+		let data_ram = {
+			labels: labels,
+			datasets: [{
+			label: 'data_ram',
+			backgroundColor: 'rgb(255, 110, 132)',
+			borderColor: 'rgb(255, 110, 132)',
+			data: {{ data_ram | tojson}},
+			}]
+		};
+// Основное описание графика
+					let config_ram = {
+						type: 'line',
+						data: data_ram,
+						options: { maintainAspectRatio: false }
+					};
+
+		const ParamSystem_RAM = new Chart(
+								document.getElementById('ParamSystem_RAM'),
+								config_ram
+							);
+
+			// Обновление данных
+      function getCount() {
+
+          $.ajax({
+              url: "/get_data_system",// ссылка на функцию внутри приложения python
+              type: "GET",
+              success: function(response) {
+								// присваиваем новые данные полученные из питона в data
+								let updatedData_CPU = response.data_cpu;
+								let updateLabels = response.data_time;
+								let updatedData_Temp = response.data_temp;
+								let updatedData_Ram = response.data_ram;
+								// обновляем data и labels 
+								ParamSystem_CPU.data.labels = updateLabels;
+								ParamSystem_CPU.data.datasets[0].data = updatedData_CPU;
+								// сама функция обновления графика
+								ParamSystem_CPU.update();
+
+
+								// Обновление данных для Temp
+								ParamSystem_Temp.data.labels = updateLabels;
+								ParamSystem_Temp.data.datasets[0].data = updatedData_Temp;
+								// сама функция обновления графика
+								ParamSystem_Temp.update();
+
+								ParamSystem_RAM.data.labels = updateLabels;
+								ParamSystem_RAM.data.datasets[0].data = updatedData_Ram;
+								// сама функция обновления графика
+								ParamSystem_RAM.update();
+              },
+              error: function(error) {
+                  console.log(error);
+              }
+          });
+      }
+			// устанавливаем с какой частотой сервер будет опрашивать 
+			// приложение в питоне
+        $(document).ready(function() {
+            setInterval(getCount, 3000);
+        });
+
+
+	</script>
+</body>
+ 
+
